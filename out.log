@@ -1,0 +1,127 @@
+S3 server running on port 5000
+AWS.Request failure returned by create bucket 
+ { BucketAlreadyOwnedByYou: Your previous request to create the named bucket succeeded and you already own it.
+    at Request.extractError (/home/ec2-user/node/node_modules/aws-sdk/lib/services/s3.js:577:35)
+    at Request.callListeners (/home/ec2-user/node/node_modules/aws-sdk/lib/sequential_executor.js:105:20)
+    at Request.emit (/home/ec2-user/node/node_modules/aws-sdk/lib/sequential_executor.js:77:10)
+    at Request.emit (/home/ec2-user/node/node_modules/aws-sdk/lib/request.js:683:14)
+    at Request.transition (/home/ec2-user/node/node_modules/aws-sdk/lib/request.js:22:10)
+    at AcceptorStateMachine.runTo (/home/ec2-user/node/node_modules/aws-sdk/lib/state_machine.js:14:12)
+    at /home/ec2-user/node/node_modules/aws-sdk/lib/state_machine.js:26:10
+    at Request.<anonymous> (/home/ec2-user/node/node_modules/aws-sdk/lib/request.js:38:9)
+    at Request.<anonymous> (/home/ec2-user/node/node_modules/aws-sdk/lib/request.js:685:12)
+    at Request.callListeners (/home/ec2-user/node/node_modules/aws-sdk/lib/sequential_executor.js:115:18)
+  message: 'Your previous request to create the named bucket succeeded and you already own it.',
+  code: 'BucketAlreadyOwnedByYou',
+  region: 'us-west-2',
+  time: 2018-01-08T04:47:04.673Z,
+  requestId: 'AC2653231F0CFF11',
+  extendedRequestId: 'hGCoHUZVxfgwEmkA5RgRyL9YmtipQQaQS076S4jNDk7qOARcr+xjPtgscc5dALtPydHDN0pGTJI=',
+  cfId: undefined,
+  statusCode: 409,
+  retryable: false,
+  retryDelay: 36.432745528419815 }
+Bucket deleted:  {}
+AWS.Request success returned by create bucket 
+ Response {
+  request: 
+   Request {
+     domain: null,
+     service: 
+      Service {
+        config: [Object],
+        isGlobalEndpoint: false,
+        endpoint: [Object],
+        _clientId: 1 },
+     operation: 'createBucket',
+     params: 
+      { Bucket: 'rfarinaaws-s3-api-test',
+        ACL: 'public-read',
+        CreateBucketConfiguration: [Object] },
+     httpRequest: 
+      HttpRequest {
+        method: 'PUT',
+        path: '/',
+        headers: [Object],
+        body: '<CreateBucketConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><LocationConstraint>us-west-2</LocationConstraint></CreateBucketConfiguration>',
+        endpoint: [Object],
+        region: 'us-west-2',
+        _userAgent: 'aws-sdk-nodejs/2.177.0 linux/v8.9.4',
+        virtualHostedBucket: 'rfarinaaws-s3-api-test',
+        stream: [Object] },
+     startTime: 2018-01-08T04:47:23.109Z,
+     response: [Circular],
+     _asm: AcceptorStateMachine { currentState: 'success', states: [Object] },
+     _haltHandlersOnError: false,
+     _events: 
+      { validate: [Array],
+        afterBuild: [Array],
+        restart: [Array],
+        sign: [Array],
+        validateResponse: [Array],
+        send: [Array],
+        httpHeaders: [Array],
+        httpData: [Array],
+        httpDone: [Array],
+        retry: [Array],
+        afterRetry: [Array],
+        build: [Array],
+        extractData: [Array],
+        extractError: [Array],
+        httpError: [Array],
+        beforePresign: [Array],
+        success: [Array],
+        error: [Array] },
+     emit: [Function: emit],
+     signedAt: 2018-01-08T04:47:23.248Z },
+  data: { Location: 'http://rfarinaaws-s3-api-test.s3.amazonaws.com/' },
+  error: null,
+  retryCount: 1,
+  redirectCount: 0,
+  httpResponse: 
+   HttpResponse {
+     statusCode: 200,
+     headers: 
+      { 'x-amz-id-2': '2n2Ha9jyFoG4ISEFyA1GFJACI6xVPaUlOn/8kzvnLQLTWINXlaBEcV3zft2j9pvqQTIOH91qUGs=',
+        'x-amz-request-id': '496B51A9D935541A',
+        date: 'Mon, 08 Jan 2018 04:47:24 GMT',
+        location: 'http://rfarinaaws-s3-api-test.s3.amazonaws.com/',
+        'content-length': '0',
+        server: 'AmazonS3' },
+     body: <Buffer >,
+     streaming: false,
+     stream: 
+      IncomingMessage {
+        _readableState: [Object],
+        readable: false,
+        domain: null,
+        _events: [Object],
+        _eventsCount: 3,
+        _maxListeners: undefined,
+        socket: [Object],
+        connection: [Object],
+        httpVersionMajor: 1,
+        httpVersionMinor: 1,
+        httpVersion: '1.1',
+        complete: true,
+        headers: [Object],
+        rawHeaders: [Array],
+        trailers: {},
+        rawTrailers: [],
+        upgrade: false,
+        url: '',
+        method: null,
+        statusCode: 200,
+        statusMessage: 'OK',
+        client: [Object],
+        _consuming: true,
+        _dumped: false,
+        req: [Object],
+        read: [Function] },
+     _abortCallback: [Function: callNextListener],
+     statusMessage: 'OK' },
+  maxRetries: 3,
+  maxRedirects: 10,
+  requestId: '496B51A9D935541A',
+  extendedRequestId: '2n2Ha9jyFoG4ISEFyA1GFJACI6xVPaUlOn/8kzvnLQLTWINXlaBEcV3zft2j9pvqQTIOH91qUGs=',
+  cfId: undefined }
