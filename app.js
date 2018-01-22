@@ -42,7 +42,7 @@ const objectParms = {
 // Simple Get that does not require authorization
 app.get('/api', (req, res) => {
     res.json({
-        message: 'Welcome to the S3 API'
+        message: 'Welcome to the aws-sdk API'
     });
 });
 
@@ -261,6 +261,9 @@ app.post('/api/geodata', (req, res) => {
             msg: 'The payload follows...',
             data: payload
         })
+        // We now have the payload. 
+        // We can now send the payload to the API Gateway to have it processed by lambda
+
     });    
 })
 
