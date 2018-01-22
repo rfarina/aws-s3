@@ -20,6 +20,9 @@ const s3 = new AWS.S3();
 // Instanciate and set region
 const sqs = new AWS.SQS({ region: 'us-west-2' });
 
+// SNS
+const sns = new AWS.SNS({region: 'us-west-2'});
+
 const createBucketParms = {
     Bucket: "rfarinaaws-s3-api-test",
     ACL: "private",
@@ -138,8 +141,6 @@ app.get('/api/sqs/send', function (req, res) {
 })
 
 
-
-
 app.get('/api/sqs/receive', (req, res) => {
 
     sqs.receiveMessage(receiveMsgParams, (err, data) => {
@@ -182,7 +183,8 @@ app.get('/api/sqs/receive2', (req, res) => {
     let rcvData;
     // let delMsg;
 
-    receiveMessage()  // returns promise
+    const WaitTimeSeconds = 5;
+    receiveMessage(WaitTimeSeconds)  // returns promise
     .then((msgData) => {
         if(msgData.Messages[0]) {
             msgReceived = true;
@@ -219,12 +221,56 @@ app.get('/api/sqs/receive2', (req, res) => {
     })
 
 })
-function receiveMessage() {
+
+app.get('/api/sns/publish', (req, res) => {
+    const snsPublishParams = {
+        Message: 'Published message via api as of ' + Date(),
+        Subject: 'Subject of published msg from api...',
+        TopicArn: 'arn:aws:sns:us-west-2:177308375997:mySNSTopic'
+    }
+    sns.publish(snsPublishParams, (err, data) => {
+        if(err) {
+            console.log('Error on sns publish: \n', err);
+            res.json({
+                msg:'Publish error',
+                error: err
+            })
+        } else {
+            console.log('Publish to Topic successfull \n', data);
+            res.json({
+                msg: 'Publish success',
+                data: data
+            })
+        }
+    })
+})
+
+app.post('/api/geodata', (req, res) => {
+    // console.log('incoming request: \n', req.query.data);
+
+    var jsonString = '';
+
+    req.on('data', function (data) {
+        jsonString += data;
+    });
+
+    req.on('end', function () {
+        let payload = JSON.parse(jsonString);
+        console.log(JSON.parse(jsonString));
+        res.json({
+            msg: 'The payload follows...',
+            data: payload
+        })
+    });    
+})
+
+function receiveMessage(WaitTimeSeconds) {
 
     return new Promise((resolve, reject) => {
 
         const receiveMsgParams = {
-            QueueUrl: "https://sqs.us-west-2.amazonaws.com/177308375997/myStandardQueue"
+            QueueUrl: "https://sqs.us-west-2.amazonaws.com/177308375997/myStandardQueue",
+            WaitTimeSeconds: WaitTimeSeconds
         }
         sqs.receiveMessage(receiveMsgParams, (err, data) => {
             if (err) {
