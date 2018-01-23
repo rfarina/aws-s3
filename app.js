@@ -40,11 +40,24 @@ const objectParms = {
 }
 
 // Simple Get that does not require authorization
-app.get('/api', (req, res) => {
+app.get('/api/', (req, res) => {
     res.json({
         message: 'Welcome to the aws-sdk API'
     });
 });
+
+// Simple Get that receives a single parameter
+app.get('/api/echoparms/', (req, res) => {
+    // Simply send it back parms
+    let parm1 = req.query.parm1 || "parm1 not found";
+    let parm2 = req.query.parm2 || "parm2 not found";
+    console.log('Parm1: ', parm1);
+    console.log('Parm2: ', parm2);
+    res.json({
+        parm1: parm1,
+        parm2
+    })
+})
 
 // Create a bucket using AWS.Request
 app.get('/api/createReq', (req, res) => {
