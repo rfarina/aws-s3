@@ -49,15 +49,22 @@ app.get('/api/', (req, res) => {
 // Simple Get that receives a single parameter
 app.get('/api/echoparms/', (req, res) => {
     // Simply send it back parms
+    console.log("req.query ", req.query);
+    console.log("req.params ", req.params);
     let parm1 = req.query.parm1 || "parm1 not found";
     let parm2 = req.query.parm2 || "parm2 not found";
     console.log('Parm1: ', parm1);
     console.log('Parm2: ', parm2);
-    res.json({
-        parm1: parm1,
-        parm2
-    })
+
+    // res.json({
+    //     parm1: parm1,
+    //     parm2
+    // })
+
+    res.json(req.query);
+
 })
+
 
 // Create a bucket using AWS.Request
 app.get('/api/createReq', (req, res) => {
@@ -280,6 +287,12 @@ app.post('/api/geodata', (req, res) => {
     });    
 })
 
+
+app.get('/api/geodata', (req, res) => {
+    res.json({
+        msg: "you've reached api/geodata"
+    })
+})
 function receiveMessage(WaitTimeSeconds) {
 
     return new Promise((resolve, reject) => {
@@ -320,6 +333,7 @@ function deleteMessage(receiptHandle) {
     }) // end promise
 
 }
+
 
 // async function x() {
 //     var promise = await new Promise(function(resolve, reject) {
