@@ -56,12 +56,12 @@ app.get('/api/echoparms/', (req, res) => {
     console.log('Parm1: ', parm1);
     console.log('Parm2: ', parm2);
 
-    // res.json({
-    //     parm1: parm1,
-    //     parm2
-    // })
+    res.json({
+        parm1: parm1,
+        parm2
+    })
 
-    res.json(req.query);
+    // res.json(req.query);
 
 })
 
