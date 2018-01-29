@@ -313,8 +313,6 @@ app.get('/api/geodata', (req, res) => {
             console.log('Successful retrieval of dynamodab data: \n', data);
             let lat = data.Items[0].lat.S;
             let lon = data.Items[0].lon.S;
-            //lat = "29.578681999999997";
-            //lon = "-98.5226813";
             let reverseLookupUrl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat +","+ lon + "&key=AIzaSyDtawYB6WRJgb7bDv36xTJLSLZORjEJLMM"; 
             request(reverseLookupUrl, function(err, response, body) {
                 if(!err) {
