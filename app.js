@@ -1,4 +1,5 @@
 const express = require('express');
+const request = require('request');
 const AWS = require('aws-sdk');
 
 // Set the Region (override from default)
@@ -16,12 +17,13 @@ const AWS = require('aws-sdk');
 
 const app = express();
 const s3 = new AWS.S3();
+const ddb = new AWS.DynamoDB({ region: 'us-west-2' });
 
 // Instanciate and set region
 const sqs = new AWS.SQS({ region: 'us-west-2' });
 
 // SNS
-const sns = new AWS.SNS({region: 'us-west-2'});
+const sns = new AWS.SNS({ region: 'us-west-2' });
 
 const createBucketParms = {
     Bucket: "rfarinaaws-s3-api-test",
@@ -174,7 +176,7 @@ app.get('/api/sqs/receive', (req, res) => {
             console.log('Success on receive message \n', data.Messages[0].ReceiptHandle);
             // Now delete the message 
             deleteMessage(data.Messages[0].ReceiptHandle)  // returns promise
-            .then(
+                .then(
                 (success) => {
                     console.log("Success on delete message \n", data);
                     res.json({
@@ -182,8 +184,8 @@ app.get('/api/sqs/receive', (req, res) => {
                         returnedData: data
                     })
                 }
-            )
-            .catch(
+                )
+                .catch(
                 (failure) => {
                     console.log("Error on delete message \n", err);
                     res.json({
@@ -191,7 +193,7 @@ app.get('/api/sqs/receive', (req, res) => {
                         returnedData: data
                     })
                 }
-            )
+                )
         }
     })
 })
@@ -205,19 +207,19 @@ app.get('/api/sqs/receive2', (req, res) => {
 
     const WaitTimeSeconds = 5;
     receiveMessage(WaitTimeSeconds)  // returns promise
-    .then((msgData) => {
-        if(msgData.Messages[0]) {
-            msgReceived = true;
-            rcvData = Object.assign({},msgData);
-            // Return a new promise for the delete message process
-            return deleteMessage(msgData.Messages[0].ReceiptHandle); // returns new promise
-            // return deleteMessage("xxx");
-        } else {
-            msgReceived = false;
-            rcvData = {};
-        }
-    })
-   .then((successfulDelete) => {
+        .then((msgData) => {
+            if (msgData.Messages[0]) {
+                msgReceived = true;
+                rcvData = Object.assign({}, msgData);
+                // Return a new promise for the delete message process
+                return deleteMessage(msgData.Messages[0].ReceiptHandle); // returns new promise
+                // return deleteMessage("xxx");
+            } else {
+                msgReceived = false;
+                rcvData = {};
+            }
+        })
+        .then((successfulDelete) => {
             msgDeleted = true;
             console.log('Success on receive message-2 and corresponding delete of message \n');
             res.json({
@@ -227,8 +229,8 @@ app.get('/api/sqs/receive2', (req, res) => {
                 msgDeleted,
                 successfulDelete: successfulDelete
             })
-    })
-    .catch(
+        })
+        .catch(
         (err) => {
             console.log('Error on receive message-2 \n', err);
             res.json({
@@ -237,8 +239,8 @@ app.get('/api/sqs/receive2', (req, res) => {
                 msgDeleted,
                 error: err
             })
-    
-    })
+
+        })
 
 })
 
@@ -249,10 +251,10 @@ app.get('/api/sns/publish', (req, res) => {
         TopicArn: 'arn:aws:sns:us-west-2:177308375997:mySNSTopic'
     }
     sns.publish(snsPublishParams, (err, data) => {
-        if(err) {
+        if (err) {
             console.log('Error on sns publish: \n', err);
             res.json({
-                msg:'Publish error',
+                msg: 'Publish error',
                 error: err
             })
         } else {
@@ -284,14 +286,66 @@ app.post('/api/geodata', (req, res) => {
         // We now have the payload. 
         // We can now send the payload to the API Gateway to have it processed by lambda
 
-    });    
+    });
 })
 
 
 app.get('/api/geodata', (req, res) => {
-    res.json({
-        msg: "you've reached api/geodata"
+    const queryParams = {
+        TableName: 'geodata',
+        Limit: 1,
+        KeyConditionExpression: "phone = :phone",
+        ExpressionAttributeValues: {
+            ":phone": {"S": "210-896-1837"}
+        },
+        ReturnConsumedCapacity: 'TOTAL',
+        Select: "ALL_ATTRIBUTES"
+    };
+
+    ddb.query(queryParams, function (err, data) {
+        if (err) {
+            console.log('Error retrieving dynamodb data: \n', err);
+            res.json({
+                msg: "Error retrieving dynamodb data",
+                error: err
+            })
+        } else {
+            console.log('Successful retrieval of dynamodab data: \n', data);
+            let lat = data.Items[0].lat.S;
+            let lon = data.Items[0].lon.S;
+            //lat = "29.578681999999997";
+            //lon = "-98.5226813";
+            let reverseLookupUrl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat +","+ lon + "&key=AIzaSyDtawYB6WRJgb7bDv36xTJLSLZORjEJLMM"; 
+            request(reverseLookupUrl, function(err, response, body) {
+                if(!err) {
+                    console.log("Google Reverse Lookup status: \n", response.statusCode);
+                    console.log("Google Reverse Lookup data: \n", JSON.parse(body)); // .address_components);
+    
+                    results = JSON.parse(body).results;
+                    let addresses = [];
+                    results.forEach(element => {
+                        addresses.push(element.formatted_address);
+                    });
+                    
+
+                    res.json({
+                        msg: "Successful retrieval of dynamodb data",
+                        data,
+                        lat: data.Items[0].lat.S,
+                        lon: data.Items[0].lon.S,
+                        addresses: addresses,
+                        body: JSON.parse(body)
+                        // address: JSON.parse(body).results[0].formatted_address // .results[0].formatted_address
+                    })
+
+                }
+            });
+
+
+        }
+
     })
+
 })
 function receiveMessage(WaitTimeSeconds) {
 
@@ -307,7 +361,7 @@ function receiveMessage(WaitTimeSeconds) {
             } else {
                 resolve(data);
             }
-        })        
+        })
 
     }) // end promise
 
