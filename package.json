@@ -5,12 +5,14 @@
   "main": "app.js",
   "dependencies": {
     "aws-sdk": "^2.177.0",
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "request": "^2.83.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+    "start": "node app.js",
+    "debug": "nodemon --inspect app.js"
+},
   "author": "Rick Farina",
   "license": "MIT"
 }
