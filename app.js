@@ -68,7 +68,7 @@ app.get('/api/echoparms/', (req, res) => {
 })
 
 
-// Create a bucket using AWS.Request
+// Create a bucket synchronously using AWS.Request
 app.get('/api/createReq', (req, res) => {
     var awsRequest = s3.createBucket(createBucketParms);
 
@@ -100,7 +100,7 @@ app.get('/api/createReq', (req, res) => {
 })
 
 
-// Create a bucket
+// Create a bucket asynchronously 
 app.get('/api/create', (req, res) => {
     s3.createBucket(createBucketParms, function (err, data) {
         if (err) {
@@ -119,7 +119,7 @@ app.get('/api/create', (req, res) => {
 
 })
 
-// Delete bucket
+// Delete bucket asynch 
 app.get('/api/delete', (req, res) => {
     s3.deleteBucket(deleteBucketParms, function (err, data) {
         if (err) {
@@ -138,6 +138,7 @@ app.get('/api/delete', (req, res) => {
 
 })
 
+// Place new message on queue asynch
 app.get('/api/sqs/send', function (req, res) {
     const sendMsgParams = {
         QueueUrl: "https://sqs.us-west-2.amazonaws.com/177308375997/myStandardQueue",
@@ -162,7 +163,7 @@ app.get('/api/sqs/send', function (req, res) {
 
 })
 
-
+// Receive "w/o" corresponding delete async
 app.get('/api/sqs/receive', (req, res) => {
 
     sqs.receiveMessage(receiveMsgParams, (err, data) => {
@@ -199,6 +200,7 @@ app.get('/api/sqs/receive', (req, res) => {
 })
 
 
+// Receive and Delete message from queue asynch
 app.get('/api/sqs/receive2', (req, res) => {
     let msgReceived = false;
     let msgDeleted = false;
@@ -211,9 +213,9 @@ app.get('/api/sqs/receive2', (req, res) => {
             if (msgData.Messages[0]) {
                 msgReceived = true;
                 rcvData = Object.assign({}, msgData);
+
                 // Return a new promise for the delete message process
                 return deleteMessage(msgData.Messages[0].ReceiptHandle); // returns new promise
-                // return deleteMessage("xxx");
             } else {
                 msgReceived = false;
                 rcvData = {};
@@ -221,17 +223,16 @@ app.get('/api/sqs/receive2', (req, res) => {
         })
         .then((successfulDelete) => {
             msgDeleted = true;
-            console.log('Success on receive message-2 and corresponding delete of message \n');
+            console.log('Success! on receive message-2 and corresponding delete of message \n');
             res.json({
-                msg: "Message-2 received from queue and deleted",
+                msg: "Message-2 received from queue and deleted!!!",
                 msgData: rcvData,
                 msgReceived,
                 msgDeleted,
                 successfulDelete: successfulDelete
             })
         })
-        .catch(
-        (err) => {
+        .catch((err) => {
             console.log('Error on receive message-2 \n', err);
             res.json({
                 msg: "error on receive message from queue and subsequent deletion",
